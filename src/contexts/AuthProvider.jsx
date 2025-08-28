@@ -12,7 +12,7 @@ const AuthProvider = ({ children }) => {
   const register = async (email, password, name) => {
     setLoading(true);
     try {
-      await axios.post("http://localhost:5005/api/auth/register", {
+      await axios.post("https://insta-nest-server-production.up.railway.app/api/auth/register", {
         email,
         password,
         name,
@@ -28,7 +28,7 @@ const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:5005/api/auth/login",
+        "https://insta-nest-server-production.up.railway.app/api/auth/login",
         { email, password },
         { withCredentials: true }
       );
@@ -45,7 +45,7 @@ const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       await axios.post(
-        "http://localhost:5005/api/auth/logout",
+        "https://insta-nest-server-production.up.railway.app/api/auth/logout",
         {},
         { withCredentials: true }
       );
@@ -61,7 +61,7 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkUser = async () => {
       try {
-        const res = await axios.get("http://localhost:5005/api/auth/profile", {
+        const res = await axios.get("https://insta-nest-server-production.up.railway.app/api/auth/profile", {
           withCredentials: true,
         });
         setUser(res.data.user);

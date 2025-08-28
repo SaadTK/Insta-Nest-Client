@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5005/api",  
+  baseURL: "https://insta-nest-server-production.up.railway.app/api",  
   withCredentials: true,  
 });
 

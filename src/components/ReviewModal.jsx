@@ -18,7 +18,7 @@ const ReviewModal = ({ user, room, isOpen, onClose, roomId }) => {
 
     try {
       await axios.post(
-        `http://localhost:5005/api/reviews/${roomId}`,
+        `https://insta-nest-server-production.up.railway.app/api/reviews/${roomId}`,
         { rating, comment },
         { withCredentials: true }
       );

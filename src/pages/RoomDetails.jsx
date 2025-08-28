@@ -14,7 +14,7 @@ const RoomDetails = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5005/api/rooms/${id}`)
+      .get(`https://insta-nest-server-production.up.railway.app/api/rooms/${id}`)
       .then((res) => {
         setRoom(res.data);
         setLoadingRoom(false);
@@ -25,7 +25,7 @@ const RoomDetails = () => {
       });
 
     axios
-      .get(`http://localhost:5005/api/reviews/${id}`)
+      .get(`https://insta-nest-server-production.up.railway.app/api/reviews/${id}`)
       .then((res) => {
         setReviews(res.data);
         setLoadingReviews(false);

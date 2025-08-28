@@ -9,7 +9,7 @@ const Testimonials = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5005/api/reviews") // Ensure this endpoint returns all reviews
+      .get("https://insta-nest-server-production.up.railway.app/api/reviews") // Ensure this endpoint returns all reviews
       .then((res) => {
         setReviews(res.data);
         setLoading(false);

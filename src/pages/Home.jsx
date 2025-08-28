@@ -27,7 +27,7 @@ const Home = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5005/api/rooms")
+      .get("https://insta-nest-server-production.up.railway.app/api/rooms")
       .then((res) => {
         const data = res.data;
         if (Array.isArray(data)) {

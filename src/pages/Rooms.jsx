@@ -21,7 +21,7 @@ const Rooms = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.get("http://localhost:5005/api/rooms", {
+      const res = await axios.get("https://insta-nest-server-production.up.railway.app/api/rooms", {
         withCredentials: true,
       });
       setRooms(res.data);
@@ -50,7 +50,7 @@ const Rooms = () => {
       .join(",");
 
     try {
-      const res = await axios.get("http://localhost:5005/api/rooms/filter", {
+      const res = await axios.get("https://insta-nest-server-production.up.railway.app/api/rooms/filter", {
         params: { ranges: rangesParam },
         withCredentials: true,
       });
