@@ -1,55 +1,86 @@
 import React, { useEffect, useState } from "react";
-import { Helmet } from "react-helmet";
 import axios from "axios";
 import RoomCard from "../components/RoomCard";
 import PageHead from "../components/PageHead";
 
-const LoadingCard = () => (
-  <div className="card bg-white/90 backdrop-blur-lg shadow-lg animate-pulse cursor-wait h-72 rounded-lg">
-    <div className="h-60 bg-gray-300 rounded-t-lg"></div>
-    <div className="card-body p-4">
-      <div className="h-6 bg-gray-300 rounded w-3/4 mb-2"></div>
-      <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
-      <div className="h-6 bg-gray-300 rounded w-1/2"></div>
-    </div>
-  </div>
-);
+const priceRanges = [
+  { label: "$10 - $50", min: 10, max: 50 },
+  { label: "$51 - $100", min: 51, max: 100 },
+  { label: "$101 - $200", min: 101, max: 200 },
+  { label: "$201 - $500", min: 201, max: 500 },
+];
 
 const Rooms = () => {
   const [rooms, setRooms] = useState([]);
-  const [filter, setFilter] = useState({
-    minPrice: "",
-    maxPrice: "",
-    capacity: "",
-  });
+  const [selectedRanges, setSelectedRanges] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
 
-  const fetchRooms = async () => {
+  // Load all rooms initially
+  const fetchAllRooms = async () => {
     setLoading(true);
-    setError(null);
-
-    const params = {};
-    if (filter.minPrice) params.minPrice = filter.minPrice;
-    if (filter.maxPrice) params.maxPrice = filter.maxPrice;
-    if (filter.capacity) params.capacity = filter.capacity;
-
+    setError("");
     try {
       const res = await axios.get("http://localhost:5005/api/rooms", {
-        params,
         withCredentials: true,
       });
       setRooms(res.data);
     } catch (err) {
       console.error(err);
-      setError("Failed to fetch rooms.");
+      setError("Failed to load rooms.");
     } finally {
       setLoading(false);
     }
   };
 
+  // Fetch filtered rooms
+  const fetchFilteredRooms = async () => {
+    setLoading(true);
+    setError("");
+
+    if (selectedRanges.length === 0) {
+      // No filters selected, fetch all
+      fetchAllRooms();
+      return;
+    }
+
+    // Prepare comma separated ranges string: e.g. "10-50,51-100"
+    const rangesParam = selectedRanges
+      .map((range) => `${range.min}-${range.max}`)
+      .join(",");
+
+    try {
+      const res = await axios.get("http://localhost:5005/api/rooms/filter", {
+        params: { ranges: rangesParam },
+        withCredentials: true,
+      });
+      setRooms(res.data);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to apply filters.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle checkbox change
+  const handleCheckboxChange = (range) => {
+    setSelectedRanges((prev) => {
+      const exists = prev.find(
+        (r) => r.min === range.min && r.max === range.max
+      );
+      if (exists) {
+        // Remove range if already selected
+        return prev.filter((r) => r.min !== range.min || r.max !== range.max);
+      } else {
+        // Add new selected range
+        return [...prev, range];
+      }
+    });
+  };
+
   useEffect(() => {
-    fetchRooms();
+    fetchAllRooms(); // Load all rooms on mount
   }, []);
 
   return (
@@ -64,52 +95,53 @@ const Rooms = () => {
           🏨 Available Rooms
         </h2>
 
-        {/* Filter Section */}
-        {/* <div className="flex flex-wrap gap-4 items-end justify-center mb-6">
-          <input
-            type="number"
-            placeholder="Min Price"
-            className="input input-bordered"
-            value={filter.minPrice}
-            onChange={(e) => setFilter({ ...filter, minPrice: e.target.value })}
-          />
-          <input
-            type="number"
-            placeholder="Max Price"
-            className="input input-bordered"
-            value={filter.maxPrice}
-            onChange={(e) => setFilter({ ...filter, maxPrice: e.target.value })}
-          />
-          <input
-            type="number"
-            placeholder="Capacity"
-            className="input input-bordered"
-            value={filter.capacity}
-            onChange={(e) => setFilter({ ...filter, capacity: e.target.value })}
-          />
-          <button
-            className="btn btn-primary px-6 py-2 rounded-lg font-semibold transition transform hover:scale-105"
-            onClick={fetchRooms}
-          >
-            Filter
-          </button>
-        </div> */}
+        {/* Price Range Filters */}
+        <div className="flex flex-wrap gap-6 justify-center mb-6">
+          {priceRanges.map((range) => (
+            <label
+              key={range.min}
+              className="inline-flex items-center space-x-2 cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                checked={selectedRanges.some(
+                  (r) => r.min === range.min && r.max === range.max
+                )}
+                onChange={() => handleCheckboxChange(range)}
+                className="checkbox checkbox-primary"
+              />
+              <span>{range.label}</span>
+            </label>
+          ))}
 
-        {/* Rooms Grid */}
+          <button
+            className="btn btn-primary px-6 py-2 rounded-lg font-semibold transition hover:scale-105"
+            onClick={fetchFilteredRooms}
+          >
+            Apply Filters
+          </button>
+        </div>
+
+        {/* Rooms Display */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {loading ? (
             Array(6)
               .fill(0)
-              .map((_, idx) => <LoadingCard key={idx} />)
+              .map((_, idx) => (
+                <div
+                  key={idx}
+                  className="h-72 bg-gray-200 animate-pulse rounded-lg"
+                />
+              ))
           ) : error ? (
-            <p className="col-span-full text-center text-red-600 text-lg font-semibold">
+            <p className="col-span-full text-center text-red-600 font-semibold">
               {error}
             </p>
-          ) : Array.isArray(rooms) && rooms.length > 0 ? (
+          ) : rooms.length ? (
             rooms.map((room) => <RoomCard key={room._id} room={room} />)
           ) : (
-            <p className="col-span-full text-center text-lg font-semibold text-gray-600">
-              No rooms found. Try adjusting your filters!
+            <p className="col-span-full text-center text-gray-600">
+              No rooms found for the selected filters.
             </p>
           )}
         </div>
