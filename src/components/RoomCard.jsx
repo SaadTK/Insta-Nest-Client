@@ -6,7 +6,6 @@ const RoomCard = ({ room }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const images = room.images || [];
 
-  // Auto-change image every 3 seconds with fade effect
   useEffect(() => {
     if (images.length === 0) return;
 
@@ -19,29 +18,48 @@ const RoomCard = ({ room }) => {
 
   return (
     <div
-      className="card cursor-pointer border border-gray-300 shadow-lg hover:shadow-xl hover:scale-105 transition-transform duration-300 rounded-lg overflow-hidden bg-white"
       onClick={() => navigate(`/rooms/${room._id}`)}
+      className="cursor-pointer bg-white shadow-lg hover:shadow-2xl transition-all duration-300 rounded-xl overflow-hidden border border-gray-200 group"
     >
-      {images.length > 0 ? (
-        <div className="relative w-full h-56">
-          <img
-            src={images[currentImageIndex]}
-            alt={room.name}
-            className="w-full h-full object-cover rounded-t-lg transition-opacity duration-700"
-          />
-          <div className="absolute inset-0 bg-black/30 rounded-t-lg"></div>
-        </div>
-      ) : (
-        <div className="w-full h-56 bg-gray-300 flex items-center justify-center rounded-t-lg">
-          No image
-        </div>
-      )}
+      {/* Image Section */}
+      <div className="relative h-56 w-full">
+        {images.length > 0 ? (
+          <>
+            <img
+              src={images[currentImageIndex]}
+              alt={room.name}
+              className="w-full h-full object-cover transition-opacity duration-700 group-hover:scale-105"
+            />
+            {/* Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+            {/* Text over Image */}
+            <div className="absolute bottom-0 p-4 text-white">
+              <h3 className="text-xl font-bold">{room.name}</h3>
+              <p className="text-sm">${room.price} / night</p>
+            </div>
+          </>
+        ) : (
+          <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600 text-sm">
+            No Image Available
+          </div>
+        )}
+      </div>
 
-      <div className="p-6 text-center">
-        <h3 className="text-2xl font-bold text-gray-800">{room.name}</h3>
-        <p className="text-lg font-semibold text-primary mt-2">
-          ${room.price} / night
-        </p>
+      {/* Info Section */}
+      <div className="p-4 space-y-2">
+        <p className="text-gray-600 text-sm line-clamp-2">{room.description}</p>
+
+        <div className="flex justify-between items-center text-sm text-gray-500">
+          <span>🛏 Capacity: {room.capacity || "N/A"}</span>
+          <span>⭐ {room.rating || "No rating"}</span>
+        </div>
+
+        <button
+          onClick={() => navigate(`/rooms/${room._id}`)}
+          className="mt-3 w-full bg-primary text-white font-semibold py-2 rounded-md hover:bg-primary-dark transition"
+        >
+          View Details
+        </button>
       </div>
     </div>
   );

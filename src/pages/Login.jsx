@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { FaGoogle, FaFacebook } from "react-icons/fa";
 import PageHead from "../components/PageHead";
 
+
 const Login = () => {
   const { login } = useContext(AuthContext);
   const [email, setEmail] = useState("");

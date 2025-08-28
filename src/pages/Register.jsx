@@ -1,11 +1,13 @@
 import React, { useContext, useState } from "react";
 import { AuthContext } from "../contexts/AuthProvider";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import { FaGoogle, FaFacebook } from "react-icons/fa";
 import PageHead from "../components/PageHead";
 
+
 const Register = () => {
+  const location = useLocation();
   const { register } = useContext(AuthContext);
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [passwordStrength, setPasswordStrength] = useState("");
@@ -33,7 +35,9 @@ const Register = () => {
     try {
       await register(email, password, name);
       toast.success("Registered! Now log in.");
-      navigate("/login");
+      // navigate("/login");
+      navigate("/login", { state: { from: location.state?.from || "/" } });
+
     } catch (err) {
       toast.error(err.message);
     }
